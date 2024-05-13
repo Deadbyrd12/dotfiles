@@ -1,4 +1,3 @@
-require('vampunzel.options')
+require('vampunzel.options') -- vanilla options
 require('vampunzel.remaps') -- vanilla nvim remaps
-require('vampunzel.plugins')
-require('vampunzel.colors')
+require('vampunzel.lazy') -- plugin installation and config
