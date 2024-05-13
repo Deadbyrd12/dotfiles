@@ -1,3 +1,20 @@
+-- if in WSL use win32yank right away instead of trying various providers
+-- saves about 150ms in startup time
+if os.getenv('WSL_DISTRO_NAME') ~= nil then
+    vim.g.clipboard = {
+        name = "win32yank",
+        copy = {
+            ['+'] = "win32yank.exe -i --crlf",
+            ['*'] = "win32yank.exe -i --crlf",
+        },
+        paste = {
+            ['+'] = "win32yank.exe -o --lf",
+            ['*'] = "win32yank.exe -o --lf",
+        },
+        cache_enabled = 0,
+    }
+end
+
 vim.opt.backup = false                          -- creates a backup file
 vim.opt.clipboard = "unnamedplus"               -- allows neovim to access the system clipboard
 vim.opt.cmdheight = 1                           -- more space in the neovim command line for displaying messages
