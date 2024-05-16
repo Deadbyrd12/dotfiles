@@ -38,8 +38,9 @@ return {
                 end, "close floating lsp previews")
 
                 -- refactoring keybinds
-                nmap('<leader>rr', vim.lsp.buf.rename, '[r]efactor [r]ename')
-                nmap('<leader>ra', vim.lsp.buf.code_action, '[r]efactor code [a]ction')
+                nmap('<leader>rr', vim.lsp.buf.rename, '[r]ename symbol')
+                nmap('<leader>ra', vim.lsp.buf.code_action, 'code [a]ction')
+                nmap('<leader>rf', vim.lsp.buf.code_action, '[f]ormat code')
 
                 -- normal lsp keybinds
                 nmap('<leader>gd', vim.lsp.buf.hover, 'goto [d]efinition')

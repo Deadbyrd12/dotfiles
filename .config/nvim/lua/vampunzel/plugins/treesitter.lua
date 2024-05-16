@@ -51,7 +51,6 @@ return {
                     'query',
                     'diff'
                 },
-
                 highlight = { enable = true },
                 indent = { enable = true }
             })
