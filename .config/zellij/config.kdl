@@ -1,0 +1,12 @@
+theme "catppuccin-mocha" // or latte, frappe and macchiato
+
+default_layout "plain"
+
+keybinds {
+    shared_except "locked" "search" {
+        bind "Ctrl h" {
+            NewTab { layout "default"; }
+            SwitchToMode "normal";
+        }
+    }
+}
