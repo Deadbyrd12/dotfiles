@@ -1,3 +1,13 @@
+-- Set OS
+-- if os.getenv('WSL_DISTRO_NAME') then -> wsl
+-- if vim.fn.has("win32") or vim.fn.has("win32unix") then
+--     vim.g.os = "Windows"
+-- elseif vim.fn.has("unix") then
+--     vim.g.os = "Linux"
+-- elseif vim.fn.has("macunix") then
+--     vim.g.os = "Mac"
+-- end
+
 -- Get local clipboard provider
 function local_clipboard()
     -- Use win32yank if available.
