@@ -1,22 +1,48 @@
--- if in WSL use win32yank right away instead of trying various providers
--- saves about 150ms in startup time
-if os.getenv('WSL_DISTRO_NAME') ~= nil then
+-- Get local clipboard provider
+function local_clipboard()
+    -- Use win32yank if available.
+    -- This ensures the system clipboard is used in WSL (even if accessed via SSH)
+    if vim.fn.executable("win32yank.exe") ~= 0 then
+        return {
+            name = "win32yank",
+            copy = { "win32yank.exe", "-i", "--crlf" },
+            paste = { "win32yank.exe", "-o", "--lf" },
+        }
+    -- TODO try other clipboard providers (xclip, wlclip, tmux, etc.)
+    -- Fallback: Use a local clipboard file to sync between neovim instances
+    else
+        return {
+            name = "clipfile",
+            copy = { "tee", vim.env.HOME .. "/.vimclip" },
+            paste = { "cat", vim.env.HOME .. "/.vimclip" }
+        }
+    end
+end
+
+local copy_remote = require('vim.ui.clipboard.osc52').copy
+local local_clip = local_clipboard()
+if local_clip then
     vim.g.clipboard = {
-        name = "win32yank",
+        name = "local:" .. local_clip.name,
         copy = {
-            ['+'] = "win32yank.exe -i --crlf",
-            ['*'] = "win32yank.exe -i --crlf",
+            ["+"] = function(lines)
+                copy_remote("+")(lines)
+                vim.fn.system(local_clip.copy, lines)
+            end,
+            ["*"] = function(lines)
+                copy_remote("*")(lines)
+                vim.fn.system(local_clip.copy, lines)
+            end,
         },
         paste = {
-            ['+'] = "win32yank.exe -o --lf",
-            ['*'] = "win32yank.exe -o --lf",
-        },
-        cache_enabled = 0,
+            ["+"] = local_clip.paste,
+            ["*"] = local_clip.paste
+        }
     }
+    vim.opt.clipboard = "unnamedplus"               -- use + as default register for clipboard operations
 end
 
 vim.opt.backup = false                          -- creates a backup file
-vim.opt.clipboard = "unnamedplus"               -- allows neovim to access the system clipboard
 vim.opt.cmdheight = 1                           -- more space in the neovim command line for displaying messages
 vim.opt.completeopt = { "menuone", "noselect" } -- mostly just for cmp
 vim.opt.conceallevel = 0                        -- so that `` is visible in markdown files
@@ -28,7 +54,6 @@ vim.opt.pumheight = 10                          -- pop up menu height
 vim.opt.showmode = false                        -- we don't need to see things like -- INSERT -- anymore
 vim.opt.showtabline = 2                         -- always show tabs
 vim.opt.smartcase = true                        -- smart case
-vim.opt.smartindent = true                      -- make indenting smarter again
 vim.opt.splitbelow = true                       -- force all horizontal splits to go below current window
 vim.opt.splitright = true                       -- force all vertical splits to go to the right of current window
 vim.opt.swapfile = false                        -- creates a swapfile
@@ -37,9 +62,6 @@ vim.opt.timeoutlen = 1000                       -- time to wait for a mapped seq
 vim.opt.undofile = true                         -- enable persistent undo
 vim.opt.updatetime = 300                        -- faster completion (4000ms default)
 vim.opt.writebackup = false                     -- if a file is being edited by another program (or was written to file while editing with another program), it is not allowed to be edited
-vim.opt.expandtab = true                        -- convert tabs to spaces
-vim.opt.shiftwidth = 0                          -- the number of spaces inserted for each indentation (0 => tabstop)
-vim.opt.tabstop = 4                             -- insert 2 spaces for a tab
 vim.opt.cursorline = true                       -- highlight the current line
 vim.opt.number = true                           -- set numbered lines
 vim.opt.relativenumber = false                  -- set relative numbered lines
@@ -49,3 +71,10 @@ vim.opt.wrap = false                            -- display lines as one long lin
 vim.opt.scrolloff = 8                           -- is one of my fav
 vim.opt.sidescrolloff = 8
 vim.opt.guifont = "monospace:h17"               -- the font used in graphical neovim applications
+
+vim.opt.expandtab = true                        -- convert tabs to spaces
+vim.opt.shiftwidth = 0                          -- the number of spaces inserted for each indentation (0 => tabstop)
+vim.opt.tabstop = 4                             -- insert 2 spaces for a tab
+vim.opt.smartindent = false
+vim.opt.cindent = true
+vim.opt.cinkeys:remove('0#')                    -- Fix comment indentation
