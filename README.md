@@ -2,4 +2,4 @@
 
 ## Todo
 ### Evaluate nvim-cmp
-Compate with plain lsp omnifunc. Does cmp have advantages? Compare performance.
+Compare with plain lsp omnifunc. Does cmp have advantages? Compare performance.

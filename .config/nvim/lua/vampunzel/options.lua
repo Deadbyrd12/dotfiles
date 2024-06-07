@@ -8,50 +8,80 @@
 --     vim.g.os = "Mac"
 -- end
 
--- Get local clipboard provider
-function local_clipboard()
-    -- Use win32yank if available.
-    -- This ensures the system clipboard is used in WSL (even if accessed via SSH)
-    if vim.fn.executable("win32yank.exe") ~= 0 then
-        return {
-            name = "win32yank",
-            copy = { "win32yank.exe", "-i", "--crlf" },
-            paste = { "win32yank.exe", "-o", "--lf" },
-        }
-    -- TODO try other clipboard providers (xclip, wlclip, tmux, etc.)
-    -- Fallback: Use a local clipboard file to sync between neovim instances
-    else
-        return {
-            name = "clipfile",
-            copy = { "tee", vim.env.HOME .. "/.vimclip" },
-            paste = { "cat", vim.env.HOME .. "/.vimclip" }
-        }
-    end
-end
+-- -- Get local clipboard provider
+-- function local_clipboard()
+--     -- Use win32yank if available.
+--     -- This ensures the system clipboard is used in WSL (even if accessed via SSH)
+--     if vim.fn.executable("win32yank.exe") ~= 0 then
+--         return {
+--             name = "win32yank",
+--             copy = { "win32yank.exe", "-i", "--crlf" },
+--             paste = { "win32yank.exe", "-o", "--lf" },
+--         }
+--     -- TODO try other clipboard providers (xclip, wlclip, tmux, etc.)
+--     -- Fallback: Use a local clipboard file to sync between neovim instances
+--     else
+--         return {
+--             name = "clipfile",
+--             copy = { "tee", vim.env.HOME .. "/.vimclip" },
+--             paste = { "cat", vim.env.HOME .. "/.vimclip" }
+--         }
+--     end
+-- end
+--
+-- local copy_remote = require('vim.ui.clipboard.osc52').copy
+-- local local_clip = local_clipboard()
+-- if local_clip then
+--     vim.g.clipboard = {
+--         name = "local:" .. local_clip.name,
+--         copy = {
+--             ["+"] = function(lines)
+--                 copy_remote("+")(lines)
+--                 vim.fn.system(local_clip.copy, lines)
+--             end,
+--             ["*"] = function(lines)
+--                 copy_remote("*")(lines)
+--                 vim.fn.system(local_clip.copy, lines)
+--             end,
+--         },
+--         paste = {
+--             ["+"] = local_clip.paste,
+--             ["*"] = local_clip.paste
+--         }
+--     }
+--     vim.opt.clipboard = "unnamedplus"               -- use + as default register for clipboard operations
+-- end
 
-local copy_remote = require('vim.ui.clipboard.osc52').copy
-local local_clip = local_clipboard()
-if local_clip then
+-- If running on windows, use win32yank since OSC52 is not properly supported
+-- This does not consider a situation where using wsl on a remote windows host
+-- connected via ssh but. Will fix that if i ever encounter that situation.
+if vim.fn.executable("win32yank.exe") ~= 0 then
     vim.g.clipboard = {
-        name = "local:" .. local_clip.name,
+        name = "win32yank",
         copy = {
-            ["+"] = function(lines)
-                copy_remote("+")(lines)
-                vim.fn.system(local_clip.copy, lines)
-            end,
-            ["*"] = function(lines)
-                copy_remote("*")(lines)
-                vim.fn.system(local_clip.copy, lines)
-            end,
+            ['+'] = { "win32yank.exe", "-i", "--crlf" },
+            ['*'] = { "win32yank.exe", "-i", "--crlf" },
         },
         paste = {
-            ["+"] = local_clip.paste,
-            ["*"] = local_clip.paste
+            ['+'] = { "win32yank.exe", "-o", "--lf" },
+            ['*'] = { "win32yank.exe", "-o", "--lf" },
         }
     }
-    vim.opt.clipboard = "unnamedplus"               -- use + as default register for clipboard operations
+else
+    vim.g.clipboard = {
+        name = 'OSC 52',
+        copy = {
+            ['+'] = require('vampunzel.osc52').copy('+'),
+            ['*'] = require('vampunzel.osc52').copy('*'),
+        },
+        paste = {
+            ['+'] = require('vampunzel.osc52').paste('+'),
+            ['*'] = require('vampunzel.osc52').paste('*'),
+        },
+    }
 end
 
+vim.opt.clipboard = "unnamedplus"               -- use + as default register for clipboard operations
 vim.opt.backup = false                          -- creates a backup file
 vim.opt.cmdheight = 1                           -- more space in the neovim command line for displaying messages
 vim.opt.completeopt = { "menuone", "noselect" } -- mostly just for cmp
