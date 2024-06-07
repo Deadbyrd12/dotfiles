@@ -1,3 +1,7 @@
+-- Taken from https://github.com/neovim/neovim/blob/master/runtime/lua/vim/ui/clipboard/osc52.lua
+-- with a single modification in line 42 (use nvim_chan_send instead of io.stdout:write)
+-- This fixed some inconsistency issues with OSC52 pasting for me
+
 local M = {}
 
 --- Return the OSC 52 escape sequence
