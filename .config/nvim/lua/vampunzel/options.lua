@@ -69,7 +69,7 @@ if vim.fn.executable("win32yank.exe") ~= 0 then
     }
 else
     vim.g.clipboard = {
-        name = 'OSC 52',
+        name = 'Custom OSC 52',
         copy = {
             ['+'] = require('vampunzel.osc52').copy('+'),
             ['*'] = require('vampunzel.osc52').copy('*'),
