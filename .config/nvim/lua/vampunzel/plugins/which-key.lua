@@ -13,14 +13,14 @@ return {
                 }
             })
 
-            wk.register({
-                f = { name = '[f]ind' },
-                r = { name = '[r]efactor' },
+            wk.add({
+                { "<leader>f", name = '[f]ind' },
+                { "<leader>r", name = '[r]efactor' },
             }, { prefix = '<leader>'})
 
             if utils.is_plugin_loaded('undotree') then
-                wk.register({
-                    u = '[u]ndotree'
+                wk.add({
+                    { "<leader>u", '[u]ndotree' }
                 }, { prefix = '<leader>' })
             end
         end
