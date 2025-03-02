@@ -1,0 +1,41 @@
+(defcfg
+  process-unmapped-keys no
+  log-layer-changes no
+)
+
+(defsrc
+          e   u    o 
+  caps a s
+                        ralt
+)
+
+(deflayermap (default)
+  caps esc
+  ralt @ult
+)
+
+(deflayermap (umlauts)
+  e @eur
+  u @ue
+  o @oe
+  a @ae
+  s @ss
+)
+
+(defalias
+  ;; tap-hold-press <t1> <t2> <tap-action> <hold-action>
+  ;; -press suffix: early execute hold action if another key is pressed
+  ;; t1: if tapping, releasing and then holding and all happens in < t1 seconds: hold tap-action
+  ;; t2: if not currently doing t1 and holding for > t2: hold hold-action
+  
+  ;; hold ralt for umlauts; double tap & hold for normal alt combos
+  ult (tap-hold-press 200 500 ralt (layer-toggle umlauts)) 
+  
+  ;; Umlaut and special character definition
+  ae (fork (unicode ä) (unicode Ä) (lsft rsft))
+  oe (fork (unicode ö) (unicode Ö) (lsft rsft))
+  ue (fork (unicode ü) (unicode Ü) (lsft rsft))
+  ;; ss (fork (unicode ß) (unicode ẞ) (lsft rsft))
+  ss (unicode ß)
+  eur (unicode €)
+)
