@@ -1,0 +1,5 @@
+profile office {
+    output eDP-1 mode 1920x1200@60.03Hz position 0,0 scale 1.25 
+    output "Dell Inc. DELL U2724DE 4RPZD34" mode 2560x1440@59.95Hz position 1536,0 scale 1.25
+    output "Dell Inc. DELL U2724DE JQPZD34" mode 2560x1440@59.95Hz position 3584,0 scale 1.25
+}
