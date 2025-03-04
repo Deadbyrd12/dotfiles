@@ -1,0 +1,4 @@
+! option   = symbols
+  codeaffen:usde  = +usde(usde)
+
+! include %S/evdev
